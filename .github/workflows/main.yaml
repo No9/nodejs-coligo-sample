@@ -7,9 +7,12 @@ jobs:
     steps:
     - name: build and deploy 
       id: coligo
-      uses: no9/coligo-action@1.2.0
+      uses: no9/coligo-action@1.4.0
       with:
         project: 'sample-app'
+        ibmapikey: ${{ secrets.IBMCLOUD_API_KEY }}
+        registryusername: 'number9'
+        registryaccesstoken: ${{ secrets.DOCKER_API_KEY }}
     # Use the output from the `hello` step
     - name: Get the output time
       run: echo "The time was ${{ steps.coligo.outputs.time }}"
