@@ -7,7 +7,7 @@ jobs:
     steps:
     - name: build and deploy 
       id: coligo
-      uses: no9/coligo-action@1.1.0
+      uses: no9/coligo-action@1.2.0
       with:
         project: 'sample-app'
     # Use the output from the `hello` step
