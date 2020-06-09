@@ -1,0 +1,3 @@
+id: "20200609145914.16295119"
+project-name: nodejs-coligo-sample
+stack: docker.io/appsody/nodejs-functions:0.2
