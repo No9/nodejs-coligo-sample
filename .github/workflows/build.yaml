@@ -1,0 +1,44 @@
+name: Appsody-Actions CI
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: build-push
+      env:
+        PROJECT: 'sample-project'
+        IBMCLOUD_API_KEY: ${{ secrets.IBMCLOUD_API_KEY }}
+        REGISTRY_USERNAME: 'number9'
+        REGISTRY_API_KEY: ${{ secrets.DOCKER_API_KEY }}
+        REGISTRY: 'docker.io'
+        GROUP: 'default'
+      run: |
+        echo 'Docker Login...'
+        echo $REGISTRY_API_KEY | docker login $REGISTRY --username $REGISTRY_USERNAME --password-stdin
+        IMAGE_NAME=${REGISTRY_USERNAME}/${REPO_NAME}:${GITHUB_SHA}
+        echo 'Installing Appsody...'
+        wget https://github.com/appsody/appsody/releases/download/0.6.4/appsody_0.6.4_amd64.deb
+        sudo apt install -f ./appsody_0.6.4_amd64.deb
+        echo 'Running Appsody build and pushing to docker registry...'
+        appsody build --tag $IMAGE_NAME --push
+        IBMCLOUD_VERSION_CHECK=false
+        curl -L https://storage.googleapis.com/knative-nightly/client/latest/kn-linux-amd64 > kn 
+        chmod +x kn
+        cp kn /usr/local/bin
+        curl -fsSL https://clis.cloud.ibm.com/download/bluemix-cli/1.1.0/linux64 > ibmcloud.tar.gz
+        tar xvzf ibmcloud.tar.gz
+        ./Bluemix_CLI/install
+        ibmcloud plugin install container-registry      
+        ibmcloud plugin install kubernetes-service
+        ibmcloud plugin install coligo
+        ibmcloud login -r us-south
+        ibmcloud target -g $GROUP
+        ibmcloud coligo target --name $PROJECT
+        ibmcloud coligo application create --name ${REPO_NAME} --image ${IMAGE_NAME}
