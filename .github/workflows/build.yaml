@@ -22,6 +22,7 @@ jobs:
       run: |
         echo 'Docker Login...'
         echo $REGISTRY_API_KEY | docker login $REGISTRY --username $REGISTRY_USERNAME --password-stdin
+        REPO_NAME=$(echo ${GITHUB_REPOSITORY} | cut -d/ -f2-)
         IMAGE_NAME=${REGISTRY_USERNAME}/${REPO_NAME}:${GITHUB_SHA}
         echo 'Installing Appsody...'
         wget https://github.com/appsody/appsody/releases/download/0.6.4/appsody_0.6.4_amd64.deb
