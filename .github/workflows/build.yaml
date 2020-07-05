@@ -11,7 +11,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: build-push
+    - name: build-deploy
       env:
         CODE_ENG_PROJECT: 'sample-project'
         IBMCLOUD_API_KEY: ${{ secrets.IBMCLOUD_API_KEY }}
@@ -43,4 +43,9 @@ jobs:
         ibmcloud login -r us-south
         ibmcloud target -g $IBM_CLOUD_RESOURCE_GROUP
         ibmcloud coligo target --name $CODE_ENG_PROJECT
-        ibmcloud coligo application create --name ${REPO_NAME} --image ${IMAGE_NAME}
+        export APP_EXISTS=$(ibmcloud coligo app list | grep ${REPO_NAME}  | wc -l)
+        if [ _$APP_EXISTS == "_1" ]; then
+            ibmcloud coligo application update --name ${REPO_NAME} --image ${IMAGE_NAME}
+        else
+            ibmcloud coligo application create --name ${REPO_NAME} --image ${IMAGE_NAME}
+        fi
